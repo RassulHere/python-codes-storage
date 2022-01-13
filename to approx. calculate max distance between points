@@ -1,0 +1,69 @@
+# what i have: 
+# 1) a list of current 500 objects' location points (current_ipt: object id, region, latitude, longitude);
+# 2) another list of about 7000 potential objects' location points (potential_ipt: object id, region, latitude, longitude);
+# 3) a dictionary of how many objects total should be placed in particular region (to_put).
+#
+# need to find where to place 1000 (out of 7000) additional objects so that the distance between all 1500 objects would be the maximum.
+
+import random
+import math
+
+where_list = []
+
+for item in to_put:
+    
+    # only to keep track of a process
+    print(item)
+    print(to_put[item])
+
+    cur_list = []
+    pot_total_list = []
+    pot_list = []
+    temp_list = []
+
+    for i in range(len(current_ipt)):
+        if current_ipt[i][1] == item:
+            cur_list.append([current_ipt[i][0],current_ipt[i][2],current_ipt[i][3]])
+    for i in range(len(potential_ipt)):
+        if potential_ipt[i][1] == item:
+            pot_total_list.append([potential_ipt[i][0],potential_ipt[i][2],potential_ipt[i][3]])
+
+    best = []        
+    max_distance = 0
+
+    # having short time period, i decided to randomly pick potential points and choose the best result.
+    for i in range(1000):
+
+        r = random.sample(range(len(pot_total_list)),to_put[item])
+
+        for n in r:
+            pot_list.append(pot_total_list[n])
+
+        temp_list = []
+        temp_list.extend(cur_list)
+        temp_list.extend(pot_list)
+
+        distance = 0
+
+        for i in range(len(temp_list)):
+
+            for q in range(1,len(temp_list)-i):
+
+                distance_sqrd = (temp_list[i][1] - temp_list[i+q][1]) ** 2 + (temp_list[i][2] - temp_list[i+q][2]) ** 2
+                
+                try:
+                    distance += math.sqrt(distance_sqrd)
+                except:
+                    pass
+
+        if distance >= max_distance:
+            max_distance = distance
+            best.clear()
+            best.extend(pot_list)
+       
+        pot_list.clear()
+        temp_list.clear()
+
+    where_list.extend(best)
+    
+# finally i have a list of best (furthest) randomed objects' location points.
